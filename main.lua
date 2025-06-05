@@ -1,6 +1,6 @@
 --monsters
 
-1og. info ("Loading ".._ENV["!guid"]..".")
+log. info ("Loading ".._ENV["!guid"]..".")
 local envy = mods ["LuaENVY-ENVY" ]
 envy.auto()
 mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].auto(true)
@@ -10,7 +10,7 @@ NAMESPACE = "anx"
 
 local initialize = function()
 	local folders = {
-  "Misc",
+		"Misc",
 		"Actors",
 		"Elites"
 	}
