@@ -1,0 +1,10 @@
+﻿{
+	"name": "anxMobs",
+	"version_number": "1.0.0",
+	"website_url": "",
+	"description": "Adds some monsters",
+	"dependencies": [
+		"ReturnOfModding-ReturnOfModding-1.0.53",
+		"RoRRModdingToolkit-RoRR_Modding_Toolkit-1.2.0"
+	]
+}
