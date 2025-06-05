@@ -10,6 +10,7 @@ NAMESPACE = "anx"
 
 local initialize = function()
 	local folders = {
+  "Misc",
 		"Actors",
 		"Elites"
 	}
