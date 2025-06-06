@@ -1,5 +1,5 @@
 local spr_palette = load_sprite("ElitePaletteGuardian", "Elites/sElitePaletteGuardian.png")
-local spr_icon = load_sprite("EliteIconGuardian", "Elites/")
+local spr_icon = load_sprite("EliteIconGuardian", "Elites/sEliteIconGuardian.png")
 
 local eliteGuardian = Elite.new(NAMESPACE, "guardian")
 eliteGuardian.healthbar_icon = spr_icon
