@@ -36,8 +36,8 @@ seikret:onCreate(function(actor)
 
     actor.can_jump = true
 
-	actor:enemy_stats_init(17, 100, 22, 18)
-	actor.pHmax_base = 2.6
+	actor:enemy_stats_init(17, 120, 12, 15)
+	actor.pHmax_base = 2.4
 
 	actor.z_range = 28
 	actor:set_default_skill(Skill.SLOT.primary, seikretZ)
@@ -63,18 +63,17 @@ stateSeikretZ:onStep(function(actor, data)
     if data.fired == 0 and actor.image_index >= 3 then
         data.fired = 1
 
-        local attack = actor:fire_explosion_local(actor.x, actor.y + 6, 32, 16, 1)
+        local attack = actor:fire_explosion_local(actor.x + 8 * GM.dcos(actor:skill_util_facing_direction()), actor.y + 4, 32, 16, 1)
     end
 
+    actor:skill_util_exit_state_on_anim_end()
 end)
 
 local seikretCard = Monster_Card.new(NAMESPACE, "seikret")
 seikretCard.object_id = seikret_id
-seikretCard.spawn_cost = 16
+seikretCard.spawn_cost = 15
 seikretCard.spawn_type = Monster_Card.SPAWN_TYPE.classic
 seikretCard.can_be_blighted = true
-
-if hotload then return end
 
 local stages = {
     "ror-desolateForest",
@@ -87,3 +86,5 @@ for _, stageName in ipairs(stages) do
 	local stage = Stage.find(stageName)
 	stage:add_monster(seikretCard)
 end
+
+if hotload then return end
