@@ -1,8 +1,8 @@
 local sprites = {
-    idle	  = gm.constants.sLizardFGIdle
-    walk	  = gm.constants.sLizardFGWalk
-    jump	  = gm.constants.sLizardFGJump
-    jump_peak = gm.constants.sLizardFGJumpPeak
+    idle	  = gm.constants.sLizardFGIdle,
+    walk	  = gm.constants.sLizardFGWalk,
+    jump	  = gm.constants.sLizardFGJump,
+    jump_peak = gm.constants.sLizardFGJumpPeak,
     fall	  = gm.constants.sLizardFGFall
 }
 
