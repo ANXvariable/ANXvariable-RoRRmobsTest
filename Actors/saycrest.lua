@@ -39,7 +39,7 @@ seikret:onCreate(function(actor)
 	actor:enemy_stats_init(17, 120, 12, 15)
 	actor.pHmax_base = 2.4
 
-	actor.z_range = 28
+	actor.z_range = 150
 	actor:set_default_skill(Skill.SLOT.primary, seikretZ)
 
     actor:init_actor_late()
@@ -57,13 +57,28 @@ stateSeikretZ:onEnter(function(actor, data)
 end)
 
 stateSeikretZ:onStep(function(actor, data)
-	actor:skill_util_fix_hspeed()
-	actor:actor_animation_set(spr_shoot1, 0.2)
+    local signdir = GM.dcos(actor:skill_util_facing_direction())
+    local free = actor.free
+    if data.fired == 0 then
+	    actor:actor_animation_set(spr_shoot1, 0.05)
+        actor.pHspeed = -signdir * 0.625
+    else
+        actor:actor_animation_set(spr_shoot1, 0.2)
+    end
 
-    if data.fired == 0 and actor.image_index >= 3 then
+    if data.fired == 0 and actor.image_index >= 2 then
+        actor.pVspeed = -4
+        actor.pHspeed = signdir * 8
+
         data.fired = 1
-
-        local attack = actor:fire_explosion_local(actor.x + 8 * GM.dcos(actor:skill_util_facing_direction()), actor.y + 4, 32, 16, 1)
+    end
+    if data.fired == 1 and actor.image_index >= 3 and free then
+        actor.image_index = 3
+    elseif data.fired == 1 and actor.image_index >= 3 and not free then
+        data.fired = 2
+	    actor:skill_util_fix_hspeed()
+        actor.image_index = 4
+        local attack = actor:fire_explosion_local(actor.x + 8 * signdir, actor.y + 4, 64, 32, 1)
     end
 
     actor:skill_util_exit_state_on_anim_end()
