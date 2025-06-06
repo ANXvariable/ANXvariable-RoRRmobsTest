@@ -1,0 +1,9 @@
+{
+	"actor" : {
+		"Seikret.name" : "Seikret"
+	},
+
+	"elite" : {
+		"guardian.name" : "Guardian %s"
+	}
+}
