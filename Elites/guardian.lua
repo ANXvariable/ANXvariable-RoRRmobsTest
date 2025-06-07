@@ -44,9 +44,24 @@ Callback.add("preStep", "destroyGuardianCrystals", function()
     local crystals = Instance.find_all(Object.find("ror-artiSnap"))
     for _, found_crystal in ipairs(crystals) do
         if found_crystal.team ~= 1 then
-            if found_crystal.parent.hp <= 0 then
-                found_crystal:destroy()
-            end
+            if found_crystal.parent.hp then
+				if found_crystal.parent.hp <= 1 then
+                	found_crystal:destroy()
+				elseif found_crystal.despawn_time > found_crystal.parent.despawn_time then
+					found_crystal.despawn_time = found_crystal.parent.despawn_time - 1
+					if found_crystal.despawn_time < Global._current_frame then
+						if not found_crystal:exists() then return end
+
+        				--instance_data[found_crystal.value.id] = nil
+        				GM.instance_destroy(found_crystal.value, false)
+					end
+				end				
+			else
+				if not found_crystal:exists() then return end
+
+        		--instance_data[found_crystal.value.id] = nil
+        		GM.instance_destroy(found_crystal.value, false)
+			end
         end
     end
 end)
