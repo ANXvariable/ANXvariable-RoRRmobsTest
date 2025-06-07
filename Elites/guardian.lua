@@ -28,7 +28,7 @@ itemEliteOrbGuardian:onPostStep(function(actor, stack)
 	if data.guardian_timer < 0 then
 		data.guardian_timer = 600 + math.random(240)
 
-		if grounded and actor.hp > actor.maxhp / 10 then
+		if grounded and actor.hp > actor.maxhp / 10 and Global._current_frame - 14 * 60 < actor.despawn_time then
 			local crystal = Instance.wrap(GM.instance_create(actor.x, actor.bbox_bottom - 24, gm.constants.oArtiSnap))
 			crystal.parent = actor
             crystal.maxhp = actor.maxhp / 2.8
