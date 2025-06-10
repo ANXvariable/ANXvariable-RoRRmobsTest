@@ -1,6 +1,8 @@
 {
 	"actor" : {
-		"Seikret.name" : "Seikret"
+		"Seikret.name" : "Seikret",
+		"Kulu.name" : "Kulu-Ya-Ku",
+		"Kulu.text" : "Ovivore Outlaw"
 	},
 
 	"elite" : {
