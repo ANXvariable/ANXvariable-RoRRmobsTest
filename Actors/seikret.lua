@@ -14,6 +14,10 @@ local spr_shoot1	= gm.constants.sLizardFGShoot1
 
 GM.elite_generate_palettes(spr_pal)
 
+local snd_spawn = gm.constants.wGolemB_Spawn
+local snd_hit   = gm.constants.wGolemB_Hit
+local snd_death = gm.constants.wGolemB_Death
+
 local seikret = Object.new(NAMESPACE, "Seikret", Object.PARENT.enemyClassic)
 local seikret_id = seikret.value
 seikret.obj_sprite = sprites.idle
@@ -33,6 +37,10 @@ seikret:onCreate(function(actor)
     actor.sprite_fall = sprites.fall
     actor.sprite_death = spr_death
     actor.mask_index = spr_mask
+
+    actor.sound_spawn = snd_spawn
+    actor.sound_hit = snd_hit
+    actor.sound_death = snd_death
 
     actor.can_jump = true
 
@@ -54,6 +62,8 @@ stateSeikretZ:clear_callbacks()
 stateSeikretZ:onEnter(function(actor, data)
 	actor.image_index = 0
 	data.fired = 0
+
+    actor.interrupt_sound = actor:sound_play(gm.constants.wGolemB_Shoot_1, 1.0, (0.9 + math.random() * 0.2) * actor.attack_speed)
 end)
 
 stateSeikretZ:onStep(function(actor, data)
@@ -78,6 +88,7 @@ stateSeikretZ:onStep(function(actor, data)
         data.fired = 2
 	    actor:skill_util_fix_hspeed()
         actor.image_index = 4
+        actor:sound_play(gm.constants.wGolemB_Shoot_2, 1.0, (0.9 + math.random() * 0.2) * actor.attack_speed)
         local attack = actor:fire_explosion_local(actor.x + 8 * signdir, actor.y + 4, 64, 32, 1)
     end
 
