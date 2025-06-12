@@ -2,7 +2,9 @@
 	"actor" : {
 		"Seikret.name" : "Seikret",
 		"Kulu.name" : "Kulu-Ya-Ku",
-		"Kulu.text" : "Ovivore Outlaw"
+		"Kulu.text" : "Ovivore Outlaw",
+		"GreatJaggi.name" : "Great Jaggi",
+		"GreatJaggi.text" : "Dog Wyvern"
 	},
 
 	"elite" : {
