@@ -22,6 +22,10 @@ GM.elite_generate_palettes(spr_pal)
 
 --snd
 
+local snd_spawn = gm.constants.wLizardSpawn
+local snd_hit   = gm.constants.wLizardHit
+local snd_death = gm.constants.wLizardDeath
+
 local kulu = Object.new(NAMESPACE, "Kulu", Object.PARENT.bossClassic)
 local kulu_id = kulu.value
 kulu.obj_sprite = sprites.idle
@@ -57,9 +61,9 @@ kulu:onCreate(function(actor)
     actor.sprite_death = spr_death
     actor.mask_index = spr_mask
 
-    --actor.sound_spawn = snd_spawn
-    --actor.sound_hit = snd_hit
-    --actor.sound_death = snd_death
+    actor.sound_spawn = snd_spawn
+    actor.sound_hit = snd_hit
+    actor.sound_death = snd_death
 
     actor.can_jump = true
 
@@ -161,13 +165,17 @@ obj_kuluRock:clear_callbacks()
 obj_kuluRock:onCreate(function(actor)
     actor.mask_index = spr_rock_mask
 
+	actor:enemy_stats_init(1, 20, math.huge, 0)
+    actor:init_actor_late()
+
     actor.team = 2
     actor.parent = -4
-    actor.armor = 10000
+    actor.armor = 225000
     actor.maxhp_base = 20
     actor.maxhp = 20
     actor.hp = 20
     actor.damage = 1
+    
 end)
 
 obj_kuluRock:onStep(function(actor)
