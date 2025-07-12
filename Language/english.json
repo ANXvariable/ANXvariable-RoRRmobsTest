@@ -11,6 +11,7 @@
 	},
 
 	"elite" : {
-		"guardian.name" : "Guardian %s"
+		"guardian.name" : "Guardian %s",
+		"dracofrenzy.name" : "Dracofrenzied %s"
 	}
 }
