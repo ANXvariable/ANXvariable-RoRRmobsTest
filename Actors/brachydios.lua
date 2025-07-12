@@ -1,5 +1,7 @@
 local path_string = "Actors/Large Monsters/Brute Wyverns/Brachydios/"
 
+local spr_none = gm.constants.sNone
+
 local sprites = {
     idle	  = load_sprite("brachydiosIdle", path_string.."sBrachydiosIdle.png", 1, 102, 40),
     walk	  = load_sprite("brachydiosWalk", path_string.."sBrachydiosIdle.png", 1, 102, 40),
@@ -12,17 +14,25 @@ local spr_mask		= sprites.idle
 local spr_pal		= load_sprite("brachydiosPalette", path_string.."sBrachydiosPalette.png", 1)
 local spr_spawn		= load_sprite("brachydiosSpawn", path_string.."sBrachydiosFunny.png", 1, 102, 40)
 local spr_death		= load_sprite("brachydiosDeath", path_string.."sBrachydiosDeath.png", 2, 102, 40)
---local spr_shoot1	= load_sprite("brachydiosShoot1", path_string.."sBrachydiosShoot1.png", 9, 102, 40)
+local spr_shoot1	= load_sprite("brachydiosShoot1", path_string.."sBrachydiosShoot1.png", 14, 102, 124)
 local spr_shoot2	= load_sprite("brachydiosShoot2", path_string.."sBrachydiosShoot2.png", 24, 102, 40)
 local spr_shoot4	= load_sprite("brachydiosShoot4", path_string.."sBrachydiosShoot4.png", 33, 102, 40)
 
+local spr_puddle	= load_sprite("brachSlimePuddle", path_string.."sBrachSlimePuddle.png", 1, 16, 5)
+
 GM.elite_generate_palettes(spr_pal)
+
+local spr_buff_blastscourge = load_sprite("sBuffBlastscourge", path_string.."sBuffBlastscourge.png", 1, 7, 8)
 
 --snd
 
-local snd_shoot1 = load_sound("brachydiosShoot1", path_string.."wBrachydiosShoot1.ogg")
-local snd_shoot2_1 = load_sound("brachydiosShoot2_1", path_string.."wBrachydiosShoot2_1.ogg")
-local snd_shoot2_3 = load_sound("brachydiosShoot2_3", path_string.."wBrachydiosShoot2_3.ogg")
+local snd_shoot1	= load_sound("brachydiosShoot1", path_string.."wBrachydiosShoot1.ogg")
+local snd_shoot2_1	= load_sound("brachydiosShoot2_1", path_string.."wBrachydiosShoot2_1.ogg")
+local snd_shoot2_3	= load_sound("brachydiosShoot2_3", path_string.."wBrachydiosShoot2_3.ogg")
+local snd_hand1		= load_sound("brachydiosHandImpact1", path_string.."wBrachydiosHandImpact1.ogg")
+local snd_hand2		= load_sound("brachydiosHandImpact2", path_string.."wBrachydiosHandImpact2.ogg")
+
+local snd_puddle_create = load_sound("brachydiosSlimePool", path_string.."wBrachydiosSlimePool.ogg")
 
 local snd_spawn = gm.constants.wLizardSpawn
 local snd_hit   = gm.constants.wLizardHit
@@ -33,11 +43,14 @@ local brachydios_id = brachydios.value
 brachydios.obj_sprite = sprites.idle
 brachydios.obj_depth = 11
 
-local slimePuddle = Object.new(NAMESPACE, "slimePuddle")
-slimePuddle.obj_sprite = 0
-slimePuddle.obj_depth = 10
+local obj_brachSlimePuddle = Object.new(NAMESPACE, "brachSlimePuddle")
+obj_brachSlimePuddle.obj_sprite = spr_puddle
+obj_brachSlimePuddle.obj_depth = -1
 
 local blastScourge = Buff.new(NAMESPACE, "blastScourge")
+local blastScourge_id = blastScourge.value
+blastScourge.icon_sprite = spr_buff_blastscourge
+blastScourge.is_debuff = true
 
 local brachydiosZ = Skill.new(NAMESPACE, "brachydiosZ")
 local stateBrachydiosZ = State.new(NAMESPACE, "stateBrachydiosZ")
@@ -79,10 +92,10 @@ brachydios:onCreate(function(actor)
 	actor:enemy_stats_init(15, 1350, 150, 90)
 	actor.pHmax_base = 2.8
 
-	actor.z_range = 80
+	actor.z_range = 120
     actor.x_range = 120
     actor.v_range = 500
-	--actor:set_default_skill(Skill.SLOT.primary, brachydiosZ)
+	actor:set_default_skill(Skill.SLOT.primary, brachydiosZ)
 	actor:set_default_skill(Skill.SLOT.secondary, brachydiosX)
 	--actor:set_default_skill(Skill.SLOT.utility, brachydiosC)
 	actor:set_default_skill(Skill.SLOT.special, brachydiosV)
@@ -104,17 +117,22 @@ stateBrachydiosZ:onEnter(function(actor, data)
 	actor.image_index = 0
 	data.fired = 0
 
-    actor.interrupt_sound = actor:sound_play(gm.constants.wLizardShoot1, 1.0, (0.9 + math.random() * 0.2) * actor.attack_speed)
+    actor.interrupt_sound = actor:sound_play(snd_shoot1, 1.0, (0.9 + math.random() * 0.2) * actor.attack_speed)
 end)
 
 stateBrachydiosZ:onStep(function(actor, data)
     local signdir = GM.dcos(actor:skill_util_facing_direction())
-    local target = actor.target
+    --local target = actor.target
     actor:actor_animation_set(spr_shoot1, 0.2)
     actor:skill_util_fix_hspeed()
 
-    if actor.image_index >= 3 and data.fired == 0 then
-        local attack = actor:fire_explosion_local(actor.x + 36 * signdir, actor.y + 32, 48, 32, 1)
+    if actor.image_index >= 10 and data.fired == 0 then
+        local handx = actor.x + 72 * signdir
+        actor.interrupt_sound = actor:sound_play(snd_hand1, 1, (0.9 + math.random() * 0.2))
+        local attack = actor:fire_explosion_local(handx, actor.y + 32, 48, 32, 1)
+        attack.attack_info._anx_blastscourge = true
+        puddle = obj_brachSlimePuddle:create(handx, actor.bbox_bottom)
+        puddle.parent = actor
         actor:skill_util_nudge_forward(3 * signdir)
 
         data.fired = 1
@@ -193,6 +211,96 @@ stateBrachydiosV:onStep(function(actor, data)
     end
 
     actor:skill_util_exit_state_on_anim_end()
+end)
+
+Callback.add(Callback.TYPE.onAttackHit, "anxApplyBlastscourge", function(hit_info)
+	if hit_info.attack_info._anx_blastscourge then
+        local victim = hit_info.target
+        if victim:buff_stack_count(blastScourge) == 0 then
+		    victim:buff_apply(blastScourge, 15 * 60)
+        end
+	end
+end)
+
+blastScourge:onApply(function(actor, stack)
+    local data = actor:get_data()
+    data.blastCureFailure = false
+end)
+
+blastScourge:onPostStep(function(actor, stack)
+	local data = actor:get_data()
+	local bufftime = GM.get_buff_time(actor, blastScourge)
+    local utility = actor:get_active_skill(Skill.SLOT.utility)
+    local cooldown
+    if utility.cooldown > utility.cooldown_base then
+        cooldown = utility.cooldown
+    else
+        cooldown = utility.cooldown_base
+    end
+	if bufftime <= 1 then
+		data.blastCureFailure = true
+	end
+	if bufftime >= (15 * 60) + (cooldown * 4) + (5 * 60) + 1 then
+		data.blastCureFailure = false
+		actor:buff_remove(blastScourge)
+	end
+end)
+
+blastScourge:onUtilityUse(function(actor, stack, utility)
+	local bufftime = GM.get_buff_time(actor, blastScourge)
+    if bufftime > 1 then
+        GM.set_buff_time(actor, blastScourge, bufftime + utility.cooldown_base + (5 * 60))
+    end
+end)
+
+blastScourge:onRemove(function(actor, stack)
+    local data = actor:get_data()
+    if data.blastCureFailure == true and actor:is_authority() then
+        local x = actor.x
+        local y = actor.y
+        local xsize = 64
+        local ysize = 64
+        local team = 2
+        local damage = actor.maxhp * 0.05
+        local critical = false
+        local explosion_sprite = gm.constants.sEfExplosiveGreen
+        local sparks_sprite = gm.constants.sNone
+        local attack = GM._mod_attack_fire_explosion_noparent(x, y, xsize, ysize, team, damage, critical, explosion_sprite, sparks_sprite)
+    end
+end)
+
+obj_brachSlimePuddle:onCreate(function(instance)
+    instance.parent = -4
+    instance.fuse = 0
+    instance.interrupt_sound = instance:sound_play(snd_puddle_create, 1, (0.9 + math.random() * 0.2))
+end)
+
+obj_brachSlimePuddle:onStep(function(instance)
+    local actor = instance.parent
+    local actor_collisions, _ = instance:get_collisions(gm.constants.pActorCollisionBase)
+    if Instance.exists(actor) then
+        for _, other_actor in ipairs(actor_collisions) do
+            if actor:attack_collision_canhit(other_actor) and not GM.bool(actor.free) and other_actor:buff_stack_count(blastScourge) == 0 then
+                local attack = actor:fire_direct(other_actor, 0.01, 0, other_actor.x, other_actor.y, nil, false)
+                attack.attack_info._anx_blastscourge = true
+            end
+        end
+    end
+    instance.fuse = instance.fuse + 1
+    if instance.fuse >= 180 then
+        instance:destroy()
+        return
+    end
+end)
+
+obj_brachSlimePuddle:onDestroy(function(instance)
+    local actor = instance.parent
+    if Instance.exists(actor) then
+        actor:fire_explosion_local(instance.x, instance.y - 3, 34 * instance.image_xscale, 8 * instance.image_yscale, 1, gm.constants.sEfExplosive, false)
+    else
+        GM._mod_attack_fire_explosion_noparent(instance.x, instance.y - 3, 34 * instance.image_xscale, 8 * instance.image_yscale, 2, 25, false, gm.constants.sEfExplosive, spr_none)
+    end
+    instance:sound_play(gm.constants.wExplosiveShot, 0.8, 1)
 end)
 
 local brachydiosCard = Monster_Card.new(NAMESPACE, "brachydios")

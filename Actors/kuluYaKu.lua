@@ -98,7 +98,7 @@ stateKuluZ:onStep(function(actor, data)
     local signdir = GM.dcos(actor:skill_util_facing_direction())
     local free = actor.free
     local target = actor.target
-    local tgtdistx = target.x - actor.x
+    local tgtdistx = GM.clamp((target.x - actor.x), -960/2, 960/2)
     if data.fired == 0 then
 	    actor:actor_animation_set(spr_shoot1, 0.05)
         actor.pHspeed = -signdir * 0.625
@@ -107,7 +107,7 @@ stateKuluZ:onStep(function(actor, data)
     end
 
     if data.fired == 0 and actor.image_index >= 2 then
-        actor.pVspeed = -6
+        actor.pVspeed = -8
         local t = (-2 * actor.pVspeed) / actor.pGravity1
         if GM.sign(tgtdistx) == signdir then
             actor.pHspeed = tgtdistx / t
